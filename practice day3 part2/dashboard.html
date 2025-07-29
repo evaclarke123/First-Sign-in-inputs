@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    input, button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+    }
+    #warning {
+      color: red;
+      font-weight: bold;
+    }
+    #output {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Welcome, <span id="username"></span>!</h1>
+  <button id="log-out" onclick="logout()">Log Out</button>
+
+  <hr>
+
+  <h2>Invite a Friend</h2>
+  <input type="text" id="yourName" placeholder="Your Name">
+  <input type="text" id="email" placeholder="Your Friend's Email">
+  <input type="text" id="friendName" placeholder="Friend's Name">
+  <input type="text" id="groupName" placeholder="Group Name">
+  <button onclick="Entry()">Submit</button>
+
+  <div id="warning"></div>
+  <div id="output"></div>
+
+  <script>
+    // Check if user is logged in
+    let user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!user) {
+      location.href = "index.html";
+    } else {
+      document.getElementById("username").innerText = user.name;
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      location.href = "index.html";
+    }
+
+    // Entry function
+    function Entry() {
+      let yourName = document.getElementById("yourName").value.trim();
+      let email = document.getElementById("email").value.trim();
+      let friendName = document.getElementById("friendName").value.trim();
+      let groupName = document.getElementById("groupName").value.trim();
+      let warning = document.getElementById("warning");
+      let output = document.getElementById("output");
+
+      // Validation
+      if (yourName === "" || email === "" || !email.includes("@gmail.com") || friendName === "" || groupName === "") {
+        warning.textContent = "Please enter all inputs correctly ❗";
+        return;
+      }
+
+      warning.textContent = "";
+
+      // Save to localStorage
+      const friendData = { yourName, email, friendName, groupName };
+      let storedFriends = JSON.parse(localStorage.getItem("friendEntries")) || [];
+      storedFriends.push(friendData);
+      localStorage.setItem("friendEntries", JSON.stringify(storedFriends));
+
+      // Show output
+      output.innerHTML = `
+        <div>👤 Your Name: ${yourName}</div>
+        <div>📧 Friend's Email: ${email}</div>
+        <div>🤝 Friend's Name: ${friendName}</div>
+        <div>👥 Group: ${groupName}</div>
+      `;
+    }
+  </script>
+</body>
+</html>

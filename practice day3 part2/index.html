@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔐 1. User System (LocalStorage Simulated)</title>
+  <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f3f4f6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+  }
+
+  h1 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+
+  input, button, select {
+    width: 320px;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border 0.3s;
+  }
+
+  input:focus, select:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+
+  button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #2980b9;
+  }
+
+  a {
+    margin-top: 10px;
+    color: #3498db;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  #war {
+    margin-top: 15px;
+    color: red;
+    font-weight: bold;
+  }
+
+  #output {
+    margin-top: 15px;
+    color: green;
+    font-weight: bold;
+  }
+</style>
+</head>
+
+<body>
+  <h1 id="form">Sign In</h1>
+  <input type="text" id="name" placeholder="Name (Enter your full name)" hidden>
+  <input type="text" id="Email" placeholder="Email (Enter your email)">
+  <input type="password" id="Password" placeholder="Password (Min 8 characters)">
+  <button id="button" onclick="LOGED()">Log In</button>
+  <a href="#" onclick="Toggle()">Register by Name</a>
+  <div id="war"></div>
+  <div id="output"></div>
+
+  <script>
+    let isLoged = true;
+
+    function Toggle() {
+      isLoged = !isLoged;
+      document.getElementById("form").innerHTML = isLoged ? "Log In" : "Register";
+      document.getElementById("button").innerHTML = isLoged ? "Log In" : "Register";
+
+      const nameField = document.getElementById("name");
+      nameField.hidden = isLoged;
+
+      document.getElementById("output").innerHTML = "";
+    }
+
+    function LOGED() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("Email").value.trim();
+      const password = document.getElementById("Password").value.trim();
+      const warning = document.getElementById("war");
+
+      // Input validation
+      if ((!isLoged && name === "") || email === "" || !email.includes("@gmail.com") || password === "" || password.length < 8) {
+        warning.textContent = "⚠️ All input fields are required and must be valid.";
+        warning.style.color = "red";
+        return;
+      }
+
+      warning.textContent = "";
+
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      if (isLoged) {
+        const existingUser = users.find(u => u.email === email && u.password === password);
+        if (existingUser) {
+          localStorage.setItem("loggedInUser", JSON.stringify(existingUser));
+          location.href = "dashboard.html"; // You can change this
+        } else {
+          showMsg("❌ Invalid email or password.");
+        }
+      } else {
+        if (users.find(u => u.email === email)) {
+          showMsg("⚠️ User already exists with this email.");
+          return;
+        }
+
+        users.push({ name, email, password });
+        localStorage.setItem("users", JSON.stringify(users));
+        showMsg("✅ Registration successful. You can now log in.");
+        Toggle(); // Switch to login view
+      }
+    }
+
+    function showMsg(message) {
+      document.getElementById("output").innerText = message;
+    }
+
+    window.onload = () => {
+      // Ensure name field is hidden if login is the default view
+      document.getElementById("name").hidden = isLoged;
+    };
+  </script>
+</body>
+
+</html>
